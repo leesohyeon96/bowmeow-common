@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: bowmeow-common
+
+# jwt secret-key
+jwt:
+  secret-key: jwt-secret-key
