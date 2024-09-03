@@ -8,20 +8,28 @@ import java.security.Key;
 import java.util.Date;
 
 public class JWTUtils {
-    private String secretKey = "jwt-secret-key"; // 보통 라이브러리화를 할때 SpringBoot를 포함하지 않음 >> 즉, @Value 사용불가능하나 어떻게 할지 의논 필요
     private final Key key;
-    private final long expirationTime;
+    private static final long JWT_EXPIRATION_TIME = 3600000; // 1시간을 밀리초로 표현
 
-    public JWTUtils(String secretKey, long expirationTime) {
+    public JWTUtils() {
+        String secretKey = System.getenv("JWT_SECRET_KEY"); // intellij에서 build 시에 지정한 환경변수의 jwt secret key를 가져옴
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalArgumentException("JWT_SECRET_KEY environment variable is empty");
+        }
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        this.expirationTime = expirationTime;
     }
 
+    /**
+     * jwt token 생성
+     * - 로그인 시 user service 에서 호출
+     * @param userId 유저 아이디
+     * @return jwt token
+     */
     public String generateToken(String userId) {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
     }
@@ -38,6 +46,12 @@ public class JWTUtils {
         return extractClaims(token).getSubject();
     }
 
+    /**
+     * jwt token validation 체크
+     * - 각 서비스에서 validation 체크
+     * @param token jwt 토큰
+     * @return validation 여부
+     */
     public boolean isTokenValid(String token) {
         try {
             extractClaims(token);
