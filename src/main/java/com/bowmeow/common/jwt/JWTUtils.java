@@ -8,6 +8,21 @@ import java.security.Key;
 import java.util.Date;
 
 public class JWTUtils {
+    /* [common project 라이브러리화 및 다른 프로젝트에서 사용방법]
+     * 1. 현재 프로젝트에서 ./gradlew publishToMavenLocal 명령어를 통해 로컬 Maven 리포지토리에 JAR을 배포
+     * 2. project tab 에서 build > libs 에 만들어진 jar 파일 확인
+     * 3. 사용할 다른 프로젝트에 gradle에 아래 내용 추가
+       repositories {
+            mavenLocal()
+            mavenCentral()
+       }
+        dependencies {
+            implementation 'com.bowmeow:bowmeow-common:1.0.0' // 2번에서 확인한 jar 파일명
+        }
+     * 4. JWTService 구현하여 사용
+     */
+
+
     private final Key key;
     private static final long JWT_EXPIRATION_TIME = 3600000; // 1시간을 밀리초로 표현
 
